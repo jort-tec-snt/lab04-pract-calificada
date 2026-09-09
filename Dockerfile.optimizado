@@ -1,0 +1,29 @@
+# Usa imagen Alpine para menor tamaño
+FROM python:3.11-alpine
+
+# Instala dependencias del sistema en una sola capa
+RUN apk add --no-cache gcc musl-dev linux-headers
+
+# Establece directorio de trabajo
+WORKDIR /app
+
+# Copia e instala dependencias primero (mejor cache)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia el código de la aplicación
+COPY app.py .
+
+# Crea un usuario no-root para seguridad
+RUN adduser -D appuser && chown -R appuser /app
+USER appuser
+
+# Expone el puerto
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000')" || exit 1
+
+# Comando de ejecución
+CMD ["python", "app.py"]
