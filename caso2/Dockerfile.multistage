@@ -1,0 +1,20 @@
+FROM python:3.11-alpine AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.11-alpine
+WORKDIR /app
+ENV PATH="/opt/venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 DATA_DIR=/app/data
+COPY --from=builder /opt/venv /opt/venv
+COPY app.py records.py ./
+COPY templates/ templates/
+COPY static/ static/
+RUN adduser -D -u 1000 appuser \
+    && mkdir -p /app/data && chown appuser:appuser /app/data
+USER appuser
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=2)" || exit 1
+CMD ["python", "app.py"]

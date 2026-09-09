@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Caso 2 · Consulta electoral</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">PRÁCTICA CALIFICADA 1 / CASO 2</p>
+    <h1>Consulta electoral</h1>
+    <p class="intro">Consulta en ONPE, registra los datos verificados y prepara tu hoja de Excel.</p>
+  </header>
+  <section class="card consultation">
+    <div>
+      <h2><span class="step">1</span> Verifica tu condición</h2>
+      <p>Abre el portal oficial y realiza tu consulta. Después indica el resultado para continuar con el registro solicitado.</p>
+      <a class="button outline" href="{{ onpe_url }}" target="_blank" rel="noopener noreferrer">Abrir consulta oficial de ONPE ↗</a>
+    </div>
+    <div>
+      <label for="operator">¿Eres miembro de mesa según la consulta?</label>
+      <select id="operator">
+        <option value="">Selecciona el resultado</option>
+        <option value="yes">Sí, soy miembro de mesa</option>
+        <option value="no">No soy miembro de mesa</option>
+      </select>
+      <p id="condition" class="hint">La consulta se realiza en el portal oficial. Esta aplicación registra los datos que ingreses.</p>
+    </div>
+  </section>
+  <section class="card">
+    <h2><span class="step">2</span> Registra la información</h2>
+    <form id="record-form">
+      <fieldset id="record-fields" disabled>
+        <div class="grid">
+          <div><label for="dni">DNI</label><input id="dni" name="dni" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" required placeholder="8 dígitos"></div>
+          <div><label for="miembro">Miembro de mesa</label><select id="miembro" name="miembro" required><option value="">Seleccionar</option><option>Sí</option><option>No</option></select></div>
+          <div class="wide"><label for="nombres">Nombres completos</label><input id="nombres" name="nombres" maxlength="150" required autocomplete="off"></div>
+          <div><label for="region">Región</label><input id="region" name="region" maxlength="150" required></div>
+          <div><label for="provincia">Provincia</label><input id="provincia" name="provincia" maxlength="150" required></div>
+          <div><label for="distrito">Distrito</label><input id="distrito" name="distrito" maxlength="150" required></div>
+          <div class="wide"><label for="direccion">Dirección del local de votación</label><input id="direccion" name="direccion" maxlength="300" required></div>
+        </div>
+        <label class="check"><input id="confirmed" type="checkbox" required> He contrastado estos datos con la consulta electoral.</label>
+        <button id="save" type="submit">Agregar a la lista</button>
+      </fieldset>
+    </form>
+    <p id="status" role="status" aria-live="polite">Consulta primero tu condición de miembro de mesa.</p>
+  </section>
+  <section class="card">
+    <div class="list-heading"><h2><span class="step">3</span> Revisa y exporta <small id="count">0 registros</small></h2><button id="export" disabled>Descargar Excel ↓</button></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>DNI</th><th>Miembro de mesa</th><th>Nombres</th><th>Región</th><th>Provincia</th><th>Distrito</th><th>Dirección del local</th><th>Acción</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p id="empty" class="hint">Todavía no hay registros. La lista se conserva al reiniciar el contenedor.</p>
+  </section>
+  <footer>Desarrollo de Soluciones en la Nube · Laboratorio 04</footer>
+</main>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

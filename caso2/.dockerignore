@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.git/
+.env
+*.md
+tests/
+data/
+*.sqlite3*
+*.xlsx

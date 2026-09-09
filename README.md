@@ -4,7 +4,7 @@ Repositorio: https://github.com/jort-tec-snt/lab04-pract-calificada
 
 Guía para ejecutar los casos 1 y 2 solicitados en `GLAB-S04-Contenedores-Microservicios.md`.
 
-> **Estado actual:** el Caso 1 está implementado en `caso1/`, con sus tres Dockerfiles. Sus construcciones y descargas reales todavía están pendientes de prueba. El Caso 2 sigue pendiente de implementación; sus comandos son la organización prevista para la entrega. El Dockerfile de la raíz corresponde únicamente al saludo del procedimiento previo.
+Los casos están implementados en `caso1/` y `caso2/`, cada uno con sus tres Dockerfiles. El Dockerfile de la raíz corresponde al saludo del procedimiento previo. Esta guía contiene los pasos para desplegar los casos; no acredita resultados de descargas, consultas electorales ni pruebas en Windows que todavía no se hayan realizado.
 
 ## 1. Preparar Windows 11
 
@@ -54,7 +54,7 @@ git clone https://github.com/jort-tec-snt/lab04-pract-calificada.git
 cd lab04-pract-calificada
 ```
 
-La estructura de los casos es la siguiente; `caso2/` todavía está pendiente de creación:
+La estructura de los casos es:
 
 ```text
 lab04-pract-calificada/
@@ -71,6 +71,9 @@ lab04-pract-calificada/
 │   └── Dockerfile.multistage
 └── caso2/
     ├── app.py
+    ├── records.py
+    ├── templates/
+    ├── static/
     ├── requirements.txt
     ├── .dockerignore
     ├── Dockerfile
@@ -78,7 +81,7 @@ lab04-pract-calificada/
     └── Dockerfile.multistage
 ```
 
-**Ejecutar únicamente los comandos de un caso que ya esté incluido en la entrega.** El Caso 1 escucha en `0.0.0.0:5000` dentro del contenedor. Se prevé la misma configuración para el Caso 2, con puertos distintos en Windows para permitir su ejecución simultánea:
+Ambos casos escuchan en `0.0.0.0:5000` dentro del contenedor. Se publican en puertos distintos de Windows para permitir su ejecución simultánea:
 
 | Caso | Aplicación solicitada | Puerto de Windows | Puerto del contenedor |
 | --- | --- | ---: | ---: |
@@ -120,6 +123,8 @@ Los archivos temporales se eliminan al terminar la respuesta o ante un error. El
 
 ## 4. Desplegar el Caso 2
 
+Esta aplicación permite abrir el portal de ONPE, registrar los datos de la consulta y descargar una hoja Excel. La consulta en ONPE es manual: el usuario la realiza en el portal y transcribe el resultado. La aplicación no determina automáticamente quién es miembro de mesa.
+
 Desde la raíz del repositorio, construir las tres variantes:
 
 ```powershell
@@ -131,7 +136,7 @@ docker build -f .\caso2\Dockerfile.multistage -t caso2:v1.2-alpine .\caso2
 Ejecutar la variante multistage:
 
 ```powershell
-docker run -d --name caso2 -p 127.0.0.1:5002:5000 caso2:v1.2-alpine
+docker run -d --name caso2 -p 127.0.0.1:5002:5000 --mount type=volume,source=caso2-datos,target=/app/data caso2:v1.2-alpine
 ```
 
 Comprobar el contenedor y revisar sus mensajes de inicio:
@@ -141,7 +146,13 @@ docker ps --filter name=caso2
 docker logs caso2
 ```
 
-Abrir <http://localhost:5002>. El enunciado pide consultar la condición de miembro de mesa en el portal electoral y, si corresponde, registrar en Excel una lista con:
+Abrir <http://localhost:5002> y seguir estos pasos:
+
+1. Pulsar **Abrir consulta oficial de ONPE** y consultar tu condición en el portal.
+2. Volver a la aplicación e indicar el resultado real. Si eres miembro de mesa, se habilita el formulario, conforme al enunciado.
+3. Ingresar los datos de cada persona, confirmar que se contrastaron con la consulta y pulsar **Agregar a la lista**.
+4. Revisar la tabla y pulsar **Descargar Excel**.
+5. Abrir `consulta-electoral.xlsx` en Windows y comprobar las columnas:
 
 - DNI.
 - Miembro de mesa.
@@ -149,7 +160,11 @@ Abrir <http://localhost:5002>. El enunciado pide consultar la condición de miem
 - Ubicación: región, provincia y distrito.
 - Dirección del local de votación.
 
-El portal indicado en el Markdown es <https://consultaelectoral.onpe.gob.pe/inicio>. La validación pendiente incluye comprobar el flujo implementado, descargar el Excel y abrirlo en Windows para revisar sus columnas y datos. Cualquier integración o configuración necesaria se documentará al implementar el caso; todavía no hay una consulta electoral automatizada disponible.
+El portal indicado en el Markdown es <https://consultaelectoral.onpe.gob.pe/inicio>. Si la consulta indica que no eres miembro de mesa, el formulario permanece deshabilitado. No ingresar un resultado distinto para habilitarlo.
+
+El DNI se valida como texto de ocho dígitos, se conservan sus ceros iniciales y se rechazan duplicados. Los registros se guardan en SQLite dentro del volumen `caso2-datos`. Reutilizar ese volumen al recrear el contenedor conserva la lista; no eliminarlo si se necesitan los datos. El Excel se descarga al equipo del docente.
+
+El Caso 2 también ejecuta como `appuser` y contiene un chequeo `/health`.
 
 ## 5. Detener y volver a iniciar
 
@@ -180,4 +195,4 @@ Volver a <http://localhost:5001> y <http://localhost:5002>. `docker run` crea un
 | Puerto ocupado | Liberar el puerto o escoger otro puerto de Windows al crear el contenedor; actualizar también la URL del navegador |
 | Contenedor detenido o página inaccesible | Revisar `docker ps -a` y `docker logs caso1` o `docker logs caso2` |
 
-Los tamaños de imágenes, estados de salud y resultados funcionales de los casos se comprobarán sobre las implementaciones finales. Esta guía todavía no acredita una prueba en Windows 11.
+Los tamaños de imágenes y estados de salud se obtienen de la ejecución real. Esta guía todavía no acredita una prueba en Windows 11.
