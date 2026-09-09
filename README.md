@@ -165,8 +165,8 @@ Abrir <http://localhost:5002> y seguir estos pasos:
 1. Pulsar **Abrir consulta oficial de ONPE** y consultar el DNI normalmente.
 2. En Firefox, abrir **Network → XHR → `definitiva` → Response** y copiar solo el JSON de respuesta. Ocultar DNI, nombres, cookies y tokens en las evidencias.
 3. Volver a la aplicación, pegar el JSON en **Respuesta JSON** y pulsar **Extraer datos del JSON**.
-4. Verificar los campos extraídos. Si la respuesta indica que eres miembro de mesa, confirmar los datos y pulsar **Agregar a la lista**.
-4. Revisar la tabla y pulsar **Descargar Excel**.
+4. Verificar los campos extraídos, confirmar los datos y pulsar **Agregar a la lista**. El registro puede conservar `Miembro de mesa = No`; el estado no se modifica para forzar un resultado positivo.
+5. Revisar la tabla y pulsar **Descargar Excel**.
 5. Abrir `consulta-electoral.xlsx` en Windows y comprobar las columnas:
 
 - DNI.
@@ -175,7 +175,7 @@ Abrir <http://localhost:5002> y seguir estos pasos:
 - Ubicación: región, provincia y distrito.
 - Dirección del local de votación.
 
-El portal indicado en el Markdown es <https://consultaelectoral.onpe.gob.pe/inicio>. Si la consulta indica que no eres miembro de mesa, el formulario permanece deshabilitado. No ingresar un resultado distinto para habilitarlo.
+El portal indicado en el Markdown es <https://consultaelectoral.onpe.gob.pe/inicio>. Si la consulta indica que no eres miembro de mesa, se permite guardar el resultado con estado `No` para que la lista Excel conserve el resultado real de la consulta.
 
 El DNI se valida como texto de ocho dígitos, se conservan sus ceros iniciales y se rechazan duplicados. Los registros se guardan en SQLite dentro del volumen `caso2-datos`. Reutilizar ese volumen al recrear el contenedor conserva la lista; no eliminarlo si se necesitan los datos. El Excel se descarga al equipo del docente.
 

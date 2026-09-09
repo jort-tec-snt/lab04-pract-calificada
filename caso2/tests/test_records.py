@@ -31,11 +31,17 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(len(list_records(self.database)), 1)
 
     def test_requires_real_consultation_confirmation(self):
-        for field in ("confirmed", "operator_is_member"):
+        for field in ("confirmed",):
             value = example()
             value[field] = False
             with self.subTest(field=field), self.assertRaises(ValidationError):
                 validate_record(value)
+
+    def test_allows_non_member_result(self):
+        value = example()
+        value["miembro"] = "No"
+        value["operator_is_member"] = False
+        self.assertEqual(validate_record(value)["miembro"], "No")
 
     def test_rejects_invalid_dni(self):
         for dni in ("123", "123456789", "1234567X", "１２３４５６７８"):

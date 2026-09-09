@@ -49,8 +49,6 @@ def extract_onpe_record(response):
 def validate_record(data):
     if not isinstance(data, dict):
         raise ValidationError("La solicitud debe contener los datos del registro.")
-    if data.get("operator_is_member") is not True:
-        raise ValidationError("Primero confirma en el portal que eres miembro de mesa, según el enunciado.")
     if data.get("confirmed") is not True:
         raise ValidationError("Confirma que contrastaste los datos con la consulta electoral.")
     result = {}

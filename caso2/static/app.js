@@ -11,10 +11,10 @@ function status(message, error = false) {
 }
 
 operator.addEventListener('change', () => {
-  const enabled = operator.value === 'yes';
+  const enabled = operator.value === 'yes' || operator.value === 'no';
   document.querySelector('#record-fields').disabled = !enabled;
-  const message = enabled ? 'Puedes registrar los datos verificados y exportar la lista.'
-    : operator.value === 'no' ? 'Según el enunciado, el registro de la lista corresponde a quien sea miembro de mesa.'
+  const message = operator.value === 'yes' ? 'Puedes registrar los datos verificados y exportar la lista.'
+    : operator.value === 'no' ? 'La consulta indica que no eres miembro de mesa; puedes guardar este resultado con estado “No”.'
     : 'Consulta primero tu condición de miembro de mesa.';
   document.querySelector('#condition').textContent = message;
   status(message);
