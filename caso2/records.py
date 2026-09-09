@@ -14,6 +14,38 @@ class ValidationError(ValueError):
     pass
 
 
+def extract_onpe_record(response):
+    """Extrae el registro desde la respuesta JSON real de consulta/definitiva.
+
+    La solicitud protegida se realiza en el navegador. Esta función solo recibe
+    su JSON de respuesta; nunca recibe cookies, WAF tokens ni Authorization.
+    """
+    if not isinstance(response, dict) or response.get("success") is not True:
+        raise ValidationError("La respuesta ONPE no indica una consulta exitosa.")
+    data = response.get("data")
+    if not isinstance(data, dict):
+        raise ValidationError("La respuesta ONPE no contiene el objeto data esperado.")
+    required = ("dni", "nombres", "apellidos", "ubigeo", "direccion")
+    if any(not isinstance(data.get(field), str) or not data[field].strip() for field in required):
+        raise ValidationError("La respuesta ONPE no contiene todos los campos requeridos.")
+    location = [part.strip() for part in data["ubigeo"].split("/")]
+    if len(location) != 3 or any(not part for part in location):
+        raise ValidationError("El campo ubigeo no tiene el formato región / provincia / distrito.")
+    is_member = data.get("miembroMesa") is True or str(data.get("cargo", "")).upper() == "MIEMBRO DE MESA"
+    return {
+        "dni": data["dni"].strip(),
+        "miembro": "Sí" if is_member else "No",
+        "nombres": f"{data['nombres'].strip()} {data['apellidos'].strip()}".strip(),
+        "region": location[0],
+        "provincia": location[1],
+        "distrito": location[2],
+        "direccion": data["direccion"].strip(),
+        "miembroMesa": is_member,
+        "cargo": str(data.get("cargo") or "").strip(),
+        "localVotacion": str(data.get("localVotacion") or "").strip(),
+    }
+
+
 def validate_record(data):
     if not isinstance(data, dict):
         raise ValidationError("La solicitud debe contener los datos del registro.")

@@ -11,12 +11,12 @@
   <header>
     <p class="eyebrow">PRÁCTICA CALIFICADA 1 / CASO 2</p>
     <h1>Consulta electoral</h1>
-    <p class="intro">Consulta en ONPE, registra los datos verificados y prepara tu hoja de Excel.</p>
+    <p class="intro">Consulta en ONPE, extrae el JSON obtenido por el navegador y prepara tu hoja de Excel.</p>
   </header>
   <section class="card consultation">
     <div>
       <h2><span class="step">1</span> Verifica tu condición</h2>
-      <p>Abre el portal oficial y realiza tu consulta. Después indica el resultado para continuar con el registro solicitado.</p>
+      <p>Abre el portal oficial y realiza tu consulta. En DevTools → Network → definitiva → Response, copia solo el JSON de respuesta, sin cookies ni tokens.</p>
       <a class="button outline" href="{{ onpe_url }}" target="_blank" rel="noopener noreferrer">Abrir consulta oficial de ONPE ↗</a>
     </div>
     <div>
@@ -31,6 +31,9 @@
   </section>
   <section class="card">
     <h2><span class="step">2</span> Registra la información</h2>
+    <label for="onpe-response">Respuesta JSON de <code>/v1/api/consulta/definitiva</code></label>
+    <textarea id="onpe-response" rows="5" placeholder='Pega aquí el JSON de Response; no incluyas Cookie, Authorization ni aws-waf-token.'></textarea>
+    <button id="extract" type="button" class="outline">Extraer datos del JSON</button>
     <form id="record-form">
       <fieldset id="record-fields" disabled>
         <div class="grid">

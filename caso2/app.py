@@ -9,7 +9,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-from records import FIELDS, HEADERS, ValidationError, add_record, initialize, list_records, remove_record
+from records import FIELDS, HEADERS, ValidationError, add_record, extract_onpe_record, initialize, list_records, remove_record
 
 ONPE_URL = "https://consultaelectoral.onpe.gob.pe/inicio"
 
@@ -49,6 +49,14 @@ def create_app(config=None):
         except ValidationError as error:
             return jsonify(error=str(error)), 400
         return jsonify(record=record), 201
+
+    @app.post("/api/onpe/extraer")
+    def extract_onpe():
+        try:
+            record = extract_onpe_record(request.get_json(silent=True))
+        except ValidationError as error:
+            return jsonify(error=str(error)), 400
+        return jsonify(record=record)
 
     @app.delete("/api/registros/<dni>")
     def delete_record(dni):

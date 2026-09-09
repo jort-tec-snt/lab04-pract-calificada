@@ -123,7 +123,21 @@ Los archivos temporales se eliminan al terminar la respuesta o ante un error. El
 
 ## 4. Desplegar el Caso 2
 
-Esta aplicación permite abrir el portal de ONPE, registrar los datos de la consulta y descargar una hoja Excel. La consulta en ONPE es manual: el usuario la realiza en el portal y transcribe el resultado. La aplicación no determina automáticamente quién es miembro de mesa.
+Esta aplicación usa el flujo permitido por el portal: el usuario consulta normalmente en el navegador y copia el JSON de la respuesta `definitiva` a la aplicación local. La aplicación extrae los campos de `data`, los muestra y permite exportarlos a Excel. No reproduce cookies, tokens Bearer, `aws-waf-token`, CAPTCHA ni telemetría.
+
+El flujo observado en DevTools es:
+
+```text
+POST /v1/api/busqueda/dni
+  Request: {"numeroDocumento":"[DNI]"}
+  Response: token temporal de la sesión del navegador
+POST /v1/api/consulta/definitiva
+  Request: {}
+  Authorization: Bearer [TOKEN TEMPORAL DEL NAVEGADOR]
+  Response: {"success":true,"data":{...}}
+```
+
+El primer token y la cookie WAF son dinámicos y de uso exclusivo de la sesión del navegador. No se incluyen en el proyecto. Las peticiones de configuración `POST /v1/api/configuracion/listar` y las solicitudes de Google Analytics/AWS WAF no son datos de scraping y se ignoran.
 
 Desde la raíz del repositorio, construir las tres variantes:
 
@@ -148,9 +162,10 @@ docker logs caso2
 
 Abrir <http://localhost:5002> y seguir estos pasos:
 
-1. Pulsar **Abrir consulta oficial de ONPE** y consultar tu condición en el portal.
-2. Volver a la aplicación e indicar el resultado real. Si eres miembro de mesa, se habilita el formulario, conforme al enunciado.
-3. Ingresar los datos de cada persona, confirmar que se contrastaron con la consulta y pulsar **Agregar a la lista**.
+1. Pulsar **Abrir consulta oficial de ONPE** y consultar el DNI normalmente.
+2. En Firefox, abrir **Network → XHR → `definitiva` → Response** y copiar solo el JSON de respuesta. Ocultar DNI, nombres, cookies y tokens en las evidencias.
+3. Volver a la aplicación, pegar el JSON en **Respuesta JSON** y pulsar **Extraer datos del JSON**.
+4. Verificar los campos extraídos. Si la respuesta indica que eres miembro de mesa, confirmar los datos y pulsar **Agregar a la lista**.
 4. Revisar la tabla y pulsar **Descargar Excel**.
 5. Abrir `consulta-electoral.xlsx` en Windows y comprobar las columnas:
 

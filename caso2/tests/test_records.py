@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from records import ValidationError, add_record, initialize, list_records, remove_record, validate_record
+from records import ValidationError, add_record, extract_onpe_record, initialize, list_records, remove_record, validate_record
 
 
 def example():
@@ -58,6 +58,20 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(len(list_records(self.database)), 1)
         self.assertTrue(remove_record(self.database, "00123456"))
         self.assertEqual(list_records(self.database), [])
+
+    def test_extracts_real_definitiva_shape(self):
+        result = extract_onpe_record({"success": True, "data": {
+            "dni": "00123456", "nombres": "ANA", "apellidos": "PEREZ",
+            "ubigeo": "LIMA / LIMA / ATE", "direccion": "CALLE 1",
+            "cargo": "NO ERES MIEMBRO DE MESA", "miembroMesa": False,
+        }})
+        self.assertEqual(result["nombres"], "ANA PEREZ")
+        self.assertEqual(result["distrito"], "ATE")
+        self.assertEqual(result["miembro"], "No")
+
+    def test_extract_rejects_waf_or_incomplete_payload(self):
+        with self.assertRaises(ValidationError):
+            extract_onpe_record({"success": True, "data": {"token": "[REDACTADO]"}})
 
 
 if __name__ == "__main__":

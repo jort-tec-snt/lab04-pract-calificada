@@ -2,6 +2,7 @@ const form = document.querySelector('#record-form');
 const operator = document.querySelector('#operator');
 const statusBox = document.querySelector('#status');
 const exportButton = document.querySelector('#export');
+const extractButton = document.querySelector('#extract');
 const fields = ['dni', 'miembro', 'nombres', 'region', 'provincia', 'distrito', 'direccion'];
 
 function status(message, error = false) {
@@ -17,6 +18,24 @@ operator.addEventListener('change', () => {
     : 'Consulta primero tu condición de miembro de mesa.';
   document.querySelector('#condition').textContent = message;
   status(message);
+});
+
+extractButton.addEventListener('click', async () => {
+  extractButton.disabled = true;
+  try {
+    const response = await fetch('/api/onpe/extraer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: document.querySelector('#onpe-response').value,
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'No se pudo extraer la respuesta ONPE.');
+    const record = result.record;
+    operator.value = record.miembroMesa ? 'yes' : 'no';
+    operator.dispatchEvent(new Event('change'));
+    for (const key of fields) document.querySelector(`#${key}`).value = record[key] || '';
+    status(`JSON extraído: ${record.cargo || (record.miembroMesa ? 'Miembro de mesa' : 'No es miembro de mesa')}. Verifica los datos antes de guardar.`);
+  } catch (error) { status(error.message, true); }
+  finally { extractButton.disabled = false; }
 });
 
 async function loadRecords() {
