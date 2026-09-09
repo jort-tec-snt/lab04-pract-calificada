@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Caso 1 · Descarga de videos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">PRÁCTICA CALIFICADA 1 / CASO 1</p>
+    <h1>Un enlace.<br>Tu video.</h1>
+    <p class="intro">Pega el enlace de un video y descárgalo en tu equipo.</p>
+    <ul class="platforms" aria-label="Plataformas contempladas">
+      {% for platform in platforms %}<li>{{ platform }}</li>{% endfor %}
+    </ul>
+    <section class="card">
+      <form id="download-form">
+        <label for="url">Enlace del video</label>
+        <input id="url" name="url" type="url" placeholder="https://www.youtube.com/watch?v=…" required maxlength="4096" autocomplete="off">
+        <button id="submit" type="submit">Descargar video <span aria-hidden="true">↓</span></button>
+      </form>
+      <div id="status" role="status" aria-live="polite">Listo para recibir un enlace.</div>
+      <p class="hint">Un video por solicitud · Hasta 200 MiB · Tiempo máximo de preparación: 3 minutos.</p>
+    </section>
+    <p class="note">Usa videos que puedas descargar. Los enlaces privados, las restricciones de acceso o los cambios de una plataforma pueden impedir la descarga.</p>
+    <footer>Desarrollo de Soluciones en la Nube · Laboratorio 04</footer>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
