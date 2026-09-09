@@ -2,9 +2,9 @@
 
 Repositorio: https://github.com/jort-tec-snt/lab04-pract-calificada
 
-Guía para ejecutar los casos 1 y 2 solicitados en `GLAB-S04-Contenedores-Microservicios.md`.
+Guía para ejecutar y documentar los casos 1 y 2 solicitados en `GLAB-S04-Contenedores-Microservicios.md`.
 
-Los casos están implementados en `caso1/` y `caso2/`, cada uno con sus tres Dockerfiles. El Dockerfile de la raíz corresponde al saludo del procedimiento previo. Esta guía contiene los pasos para desplegar los casos; no acredita resultados de descargas, consultas electorales ni pruebas en Windows que todavía no se hayan realizado.
+Los casos están implementados en `caso1/` y `caso2/`, cada uno con sus tres Dockerfiles. El Dockerfile de la raíz corresponde al saludo del procedimiento previo. Las carpetas `img/` contienen las evidencias de ejecución.
 
 ## 1. Preparar Windows 11
 
@@ -65,6 +65,7 @@ lab04-pract-calificada/
 │   ├── templates/
 │   ├── static/
 │   ├── requirements.txt
+│   ├── img/
 │   ├── .dockerignore
 │   ├── Dockerfile
 │   ├── Dockerfile.optimizado
@@ -75,6 +76,7 @@ lab04-pract-calificada/
     ├── templates/
     ├── static/
     ├── requirements.txt
+    ├── img/
     ├── .dockerignore
     ├── Dockerfile
     ├── Dockerfile.optimizado
@@ -120,6 +122,12 @@ Se admite un video por solicitud, con límite final de 200 MiB y hasta 3 minutos
 Los archivos temporales se eliminan al terminar la respuesta o ante un error. El archivo descargado queda en la ubicación seleccionada por el navegador de Windows.
 
 `yt-dlp` se instala con su versión estable disponible al construir. Si una plataforma cambia y la descarga deja de funcionar, revisar primero el error; para incorporar actualizaciones, reconstruir la variante elegida con `--no-cache`. Antes de reemplazar el contenedor, detener las descargas en curso. Cambiar una imagen no actualiza por sí solo un contenedor ya creado.
+
+### Evidencia del Caso 1
+
+La captura muestra la aplicación ejecutándose en `localhost:5001`, una URL procesada y el archivo de video entregado al navegador:
+
+![Caso 1: descarga de video completada](caso1/img/img01.png)
 
 ## 4. Desplegar el Caso 2
 
@@ -167,7 +175,7 @@ Abrir <http://localhost:5002> y seguir estos pasos:
 3. Volver a la aplicación, pegar el JSON en **Respuesta JSON** y pulsar **Extraer datos del JSON**.
 4. Verificar los campos extraídos, confirmar los datos y pulsar **Agregar a la lista**. El registro puede conservar `Miembro de mesa = No`; el estado no se modifica para forzar un resultado positivo.
 5. Revisar la tabla y pulsar **Descargar Excel**.
-5. Abrir `consulta-electoral.xlsx` en Windows y comprobar las columnas:
+6. Abrir `consulta-electoral.xlsx` en Windows y comprobar las columnas:
 
 - DNI.
 - Miembro de mesa.
@@ -180,6 +188,22 @@ El portal indicado en el Markdown es <https://consultaelectoral.onpe.gob.pe/inic
 El DNI se valida como texto de ocho dígitos, se conservan sus ceros iniciales y se rechazan duplicados. Los registros se guardan en SQLite dentro del volumen `caso2-datos`. Reutilizar ese volumen al recrear el contenedor conserva la lista; no eliminarlo si se necesitan los datos. El Excel se descarga al equipo del docente.
 
 El Caso 2 también ejecuta como `appuser` y contiene un chequeo `/health`.
+
+### Evidencias del Caso 2
+
+La primera captura documenta la consulta oficial en Firefox, con la solicitud `definitiva` seleccionada en Network y su respuesta JSON visible. Para publicar la evidencia, deben ocultarse DNI, nombres, dirección, cookies y tokens:
+
+![Caso 2: respuesta de definitiva en Firefox](caso2/img/evidencia1.png)
+
+La segunda captura muestra la importación del JSON, la extracción de campos, el estado `Miembro de mesa = No` y el registro agregado a la lista:
+
+![Caso 2: registro extraído y guardado](caso2/img/evidencia2.png)
+
+La tercera captura confirma la descarga y apertura del archivo Excel con las columnas solicitadas:
+
+![Caso 2: Excel exportado](caso2/img/evidencia3.png)
+
+Las imágenes son evidencias del laboratorio y deben revisarse antes de subirlas a un repositorio público. Sustituir cualquier captura que conserve datos personales o credenciales por una versión anonimizada.
 
 ## 5. Detener y volver a iniciar
 
